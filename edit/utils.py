@@ -140,13 +140,10 @@ def get_image_with_bbox(image, bbox, color=(255, 0, 0)):
 def get_three_channel_image(image):
     """
     If single channel (2 dim), convert to a three dimensional image and return.
-    TODO(ethan): add support for (h, w, 1)
     """
     im = image.copy()
-    # if binary, convert to rgb.
-    # if rgb, leave as is
     if len(im.shape) == 2:
-        im = np.stack((im, im, im), axis=2) * 255
+        im = np.stack((im, im, im), axis=2)
     return im
 
 
