@@ -147,20 +147,25 @@ def get_three_channel_image(image):
     return im
 
 
-def draw_polygon_on_image(image, polygon, mask_color=(0, 255, 0), radius=4, point_color=(255, 0, 0)):
+def draw_polygon_on_image(image,
+                          polygon,
+                          mask_color=None,
+                          radius=4,
+                          point_color=(255, 0, 0)):
     """Draws polygon points on image.
     """
 
     im = get_three_channel_image(image)
 
-    # im[:, :, 0][im[:, :, 0] == 255] = mask_color[0]
-    # im[:, :, 1][im[:, :, 1] == 255] = mask_color[1]
-    # im[:, :, 2][im[:, :, 2] == 255] = mask_color[2]
+    if mask_color:
+        im[:, :, 0][im[:, :, 0] == 255] = mask_color[0]
+        im[:, :, 1][im[:, :, 1] == 255] = mask_color[1]
+        im[:, :, 2][im[:, :, 2] == 255] = mask_color[2]
 
     for point in polygon:
         x, y = point  # TODO(ethan): make sure this is an integer
         try:
-            im = cv2.circle(im, (x, y), radius, point_color, -1)
+            im = cv2.circle(im, (x, y), radius, tuple(reversed(point_color)), -1)
         except:
             pass
     return im
