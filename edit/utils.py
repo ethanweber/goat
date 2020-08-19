@@ -4,6 +4,7 @@
 import numpy as np
 import torch
 import cv2
+from scipy.spatial.transform import Rotation as R
 
 
 # TODO(ethan): clean this up properly, since it's currently copy pasted without much thought
@@ -169,3 +170,61 @@ def draw_polygon_on_image(image,
         except:
             pass
     return im
+
+
+def get_camera_points(depth,
+                      intrinsics,
+                      image=None):
+    """Return points, colors after backprojecting into camera coordinates."""
+    points = []
+    colors = []
+    index_to_x_y = []
+
+    height, width = depth.shape[:2]
+    # TODO: use meshgrid(?) or faster method
+    for j in range(height):
+        for i in range(width):
+            d = depth[j, i]
+            if d == 0:
+                # TODO: don't project if the depth is 0
+                # d = 10000
+                continue
+            points.append(
+                [i * d, j * d, d]
+            )
+            color = image[j, i] if image is not None else [0, 0, 0]
+            colors.append(color)
+            index_to_x_y.append(
+                (i, j)
+            )
+
+    points = np.array(points)
+    colors = np.array(colors)
+    points = np.transpose(np.linalg.inv(intrinsics) @ np.transpose(points))
+    return points, colors, index_to_x_y
+
+
+def points_to_world(points, pose):
+    """points.shape == (X, 3)"""
+    x = np.transpose(points)
+    ones = np.ones((1, x.shape[1]))
+    x = np.concatenate((x, ones), axis=0)  # homogeneous
+    x = pose @ x
+    x = x[:3, :] / x[3, :]
+    return np.transpose(x)
+
+
+def get_angle_magnitude(pose0, pose1):
+    """Returns angle of quaternion rotation in degrees."""
+    rel = pose0 @ np.linalg.inv(pose1)
+    quat = R.from_matrix(rel[:3, :3]).as_quat()
+    w = quat[3]
+    angle = 2 * np.arccos(w)
+    angle *= (180 / np.pi)
+    return angle
+
+
+def get_distance(pose0, pose1):
+    """Returns the euclidean distance between two poses."""
+    distance = np.linalg.norm(pose0[:3, 3] - pose1[:3, 3])
+    return distance

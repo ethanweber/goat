@@ -7,8 +7,11 @@ Examples:
 from IPython.core.display import display, HTML
 import cv2
 import base64
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 from goat.edit import utils as edit_utils
+
 
 def get_html_from_image_urls(image_urls):
     html_str = """"""
@@ -47,10 +50,10 @@ def get_html_from_image(image,
     html_label_str = "" if label is None else """<div style="text-align: center">{}</div>""".format(label)
     html_div = """
         <div style="display: inline-block">
+            {} 
             <div style="text-align: center">{}</div>
-            {}
         </div>
-        """.format(html_img_str, html_label_str)
+        """.format(html_label_str, html_img_str)
     return html_div
 
 
@@ -72,3 +75,28 @@ def show_images(images,
     for image, label in zip(images, labels):
         html_div += get_html_from_image(image, height=height, width=width, label=label)
     display(HTML(html_div))
+
+
+def get_animation_from_images(images):
+    fig = plt.figure()
+
+    pltims = []
+    for i in range(len(images)):
+        im = images[i].copy()
+        val = plt.imshow(im, animated=True, interpolation='nearest')
+        plt.axis('off')
+        pltims.append([val])
+
+    ani = animation.ArtistAnimation(fig,
+                                    pltims,
+                                    interval=1000,
+                                    blit=True,
+                                    repeat_delay=1000)
+
+    return ani
+
+    # save the video
+    # ani.save('video_of_images.mp4')
+
+    # show the animation
+    # display(HTML(ani.to_html5_video()))
