@@ -4,6 +4,7 @@
 import numpy as np
 import torch
 import cv2
+from scipy.spatial.distance import euclidean as Euc
 from scipy.spatial.transform import Rotation as R
 
 
@@ -65,7 +66,8 @@ def get_polygon_from_mask(mask, thresh=10, largest_only=True):
 
 def get_polygons_from_mask(mask, thresh=1):
     try:
-        points, lengths = get_polygon_from_mask(mask, thresh=thresh, largest_only=False)
+        points, lengths = get_polygon_from_mask(
+            mask, thresh=thresh, largest_only=False)
 
         points = points.tolist()
         lengths = lengths.tolist()
@@ -87,7 +89,8 @@ def get_padded_points(mask, padding=512, thresh=10, largest_only=True):
         if gt, then don't perform any filtering
     """
     padded_points = torch.zeros(padding, 2)
-    points, polygons = get_polygon_from_mask(mask, thresh=thresh, largest_only=largest_only)
+    points, polygons = get_polygon_from_mask(
+        mask, thresh=thresh, largest_only=largest_only)
     points = torch.from_numpy(points)
     points = points.float()
     points[:, 0] = points[:, 0] / mask.shape[1]  # range (0, 1)
@@ -166,7 +169,8 @@ def draw_polygon_on_image(image,
     for point in polygon:
         x, y = point  # TODO(ethan): make sure this is an integer
         try:
-            im = cv2.circle(im, (x, y), radius, tuple(reversed(point_color)), -1)
+            im = cv2.circle(im, (x, y), radius, tuple(
+                reversed(point_color)), -1)
         except:
             pass
     return im
@@ -226,5 +230,5 @@ def get_angle_magnitude(pose0, pose1):
 
 def get_distance(pose0, pose1):
     """Returns the euclidean distance between two poses."""
-    distance = np.linalg.norm(pose0[:3, 3] - pose1[:3, 3])
+    distance = Euc(pose0[:3, 3], pose1[:3, 3])
     return distance
