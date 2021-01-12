@@ -232,3 +232,11 @@ def get_distance(pose0, pose1):
     """Returns the euclidean distance between two poses."""
     distance = Euc(pose0[:3, 3], pose1[:3, 3])
     return distance
+
+
+def get_normalized(x):
+    """Normalize numpy array to [0, 1].
+    """
+    x = (x - x.min())
+    x /= x.max()
+    return x
