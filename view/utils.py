@@ -35,17 +35,17 @@ def get_html_from_image(image,
     """
     if height is not None and width is not None:
         resized_image = cv2.resize(
-            image, (width, height), interpolation=cv2.INTER_LINEAR)
+            image, (width, height), interpolation=cv2.INTER_NEAREST)
     elif height is not None:
         h, w = image.shape[:2]
         width = int(height * (w / h))
         resized_image = cv2.resize(
-            image, (width, height), interpolation=cv2.INTER_LINEAR)
+            image, (width, height), interpolation=cv2.INTER_NEAREST)
     elif width is not None:
         h, w = image.shape[:2]
         height = int(width * (h / w))
         resized_image = cv2.resize(
-            image, (width, height), interpolation=cv2.INTER_LINEAR)
+            image, (width, height), interpolation=cv2.INTER_NEAREST)
     else:
         resized_image = image
     if len(resized_image.shape) == 2:
