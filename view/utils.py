@@ -10,8 +10,36 @@ import cv2
 import base64
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import numpy as np
 
 from goat.edit import utils as edit_utils
+
+
+def get_image_grid(
+    images,
+    rows=None,
+    cols=None
+):
+    """Returns a grid of images.
+    Assumes images are same height and same width.
+    """
+    def get_image(images, idx):
+        # returns white if out of bounds
+        if idx < len(images):
+            return images[idx]
+        else:
+            return np.ones_like(images[0]) * 255
+
+    im_rows = []
+    idx = 0
+    for i in range(rows):
+        im_row = []
+        for j in range(cols):
+            im_row.append(get_image(images, idx))
+            idx += 1
+        im_rows.append(np.hstack(im_row))
+    im = np.vstack(im_rows)
+    return im
 
 
 def get_html_from_image_urls(image_urls):
@@ -77,14 +105,18 @@ def imshow(image,
 def show_images(images,
                 labels=None,
                 height=None,
-                width=None):
+                width=None,
+                return_html=False):
     html_div = ""
     if labels is None:
         labels = [None] * len(images)
     for image, label in zip(images, labels):
         html_div += get_html_from_image(image,
                                         height=height, width=width, label=label)
-    display(HTML(html_div))
+    if return_html:
+        return html_div
+    else:
+        display(HTML(html_div))
 
 
 def get_animation_from_images(images, interval=1000):
