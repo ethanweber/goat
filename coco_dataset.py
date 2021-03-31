@@ -57,7 +57,8 @@ class COCODataset:
             image_filename = im_data["file_name"]
             image_id = im_data["id"]
             self.image_id_to_annotation_ids[image_id] = []
-            self.image_id_to_image_size[image_id] = (im_data["height"], im_data["width"])
+            # NOTE: ethan
+            # self.image_id_to_image_size[image_id] = (im_data["height"], im_data["width"])
             self.image_id_to_image_data[image_id] = im_data
             self.image_filename_to_image_id[image_filename] = image_id
             self.image_id_to_image_filename[image_id] = image_filename
