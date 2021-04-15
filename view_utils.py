@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 
-from goat.edit import utils as edit_utils
+from goat import edit_utils
 
 
 def get_image_grid(
@@ -121,11 +121,15 @@ def show_images(images,
 
 def get_animation_from_images(images, interval=1000):
     fig = plt.figure()
+    fig.subplots_adjust(bottom = 0)
+    fig.subplots_adjust(top = 1)
+    fig.subplots_adjust(right = 1)
+    fig.subplots_adjust(left = 0)
 
     pltims = []
     for i in range(len(images)):
         im = images[i].copy()
-        val = plt.imshow(im, animated=True, interpolation='nearest')
+        val = plt.imshow(im, aspect='auto')
         plt.axis('off')
         pltims.append([val])
 
