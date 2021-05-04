@@ -16,3 +16,6 @@ This library contains code and tools useful in computer vision research. The goa
 
 ### view
 - A huge component of computer vision is looking at images to understand results. However, as most computer vision research is conducted in Python, this process becomes tedious for many reasons. It's difficult to load images and visualize effectively, without designing custom configs. This becomes repetitive across projects, so here we keep our favorite ways to visualize images, utilizing the browser and web development (HTML/CSS/JavaScript).
+
+### threedvis (3D vis)
+- Code useful for 3D and real-time visualization in the web using three.js.
