@@ -11,6 +11,7 @@ import base64
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
+import urllib
 
 from goat import edit_utils
 
@@ -121,15 +122,15 @@ def show_images(images,
 
 def get_animation_from_images(images, interval=1000):
     fig = plt.figure()
-    fig.subplots_adjust(bottom = 0)
-    fig.subplots_adjust(top = 1)
-    fig.subplots_adjust(right = 1)
-    fig.subplots_adjust(left = 0)
+    fig.subplots_adjust(bottom=0)
+    fig.subplots_adjust(top=1)
+    fig.subplots_adjust(right=1)
+    fig.subplots_adjust(left=0)
 
     pltims = []
     for i in range(len(images)):
         im = images[i].copy()
-        val = plt.imshow(im, aspect='auto')
+        val = plt.imshow(im)
         plt.axis('off')
         pltims.append([val])
 
@@ -147,6 +148,18 @@ def get_animation_from_images(images, interval=1000):
     # show the animation
     # display(HTML(ani.to_html5_video()))
 
+# METHOD #1: OpenCV, NumPy, and urllib
+# https://www.pyimagesearch.com/2015/03/02/convert-url-to-image-with-python-and-opencv/
+
+
+def url_to_image(url):
+    # download the image, convert it to a NumPy array, and then read
+    # it into OpenCV format
+    resp = urllib.request.urlopen(url)
+    image = np.asarray(bytearray(resp.read()), dtype="uint8")
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+    image = image[:, :, ::-1].copy()
+    return image
 
 # def show_pcd_in_notebook(pcd, width=800, height=400):
 #     # save the point cloud
