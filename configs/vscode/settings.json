@@ -1,0 +1,15 @@
+{
+    "python.pythonPath": "/path/to/python",
+    "files.watcherExclude": {
+        "**/__pycache__/": true,
+        "**/.ipynb_checkpoints": true,
+        "**/*.ipynb": true,
+        "**/old*": true,
+        "**/output*": true,
+        "**/runs*": true,
+        "**/temp*": true,
+        "**/notebooks": true,
+        "**/*.npy": true,
+        "**/*.pkl": true
+    }
+}

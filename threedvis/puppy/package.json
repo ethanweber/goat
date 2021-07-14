@@ -11,9 +11,9 @@
     "msgpack-lite": "^0.1.26",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.2",
+    "react-scripts": "^4.0.3",
     "socket.io-client": "^2.3.0",
-    "three": "^0.119.1",
+    "three": "^0.130.1",
     "websocket": "^1.0.31"
   },
   "scripts": {

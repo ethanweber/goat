@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import {BufferGeometryUtils} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import {OBJLoader2} from 'three/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader} from 'three/examples/jsm/loaders/OBJLoader.js';
 import {ColladaLoader} from 'three/examples/jsm/loaders/ColladaLoader.js';
 import {MTLLoader} from 'three/examples/jsm/loaders/MTLLoader.js';
-import {MtlObjBridge} from 'three/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
+// import {MtlObjBridge} from 'three/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 import {STLLoader} from 'three/examples/jsm/loaders/STLLoader.js';
 import {PLYLoader} from 'three/examples/jsm/loaders/PLYLoader.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
@@ -91,7 +91,7 @@ function handle_special_geometry(geom) {
     }
     if (geom.type == "_meshfile_geometry") {
         if (geom.format == "obj") {
-            let loader = new OBJLoader2();
+            let loader = new OBJLoader();
             let obj = loader.parse(geom.data + "\n");
             let loaded_geom = merge_geometries(obj);
             loaded_geom.uuid = geom.uuid;
@@ -177,15 +177,15 @@ export class ExtensibleObjectLoader extends THREE.ObjectLoader {
                 return url;
             });
             if (json.format == "obj") {
-                let loader = new OBJLoader2(manager);
+                let loader = new OBJLoader(manager);
                 if (json.mtl_library) {
                     let mtl_loader = new MTLLoader(manager);
                     let mtl_parse_result = mtl_loader.parse(json.mtl_library + "\n", "");
                     console.log(mtl_parse_result);
-                    let materials = MtlObjBridge.addMaterialsFromMtlLoader(mtl_parse_result);
-                    console.log(materials);
-                    loader.addMaterials(materials);
-                    this.onTextureLoad();
+                    // let materials = MtlObjBridge.addMaterialsFromMtlLoader(mtl_parse_result);
+                    // console.log(materials);
+                    // loader.addMaterials(materials);
+                    // this.onTextureLoad();
                 }
                 let obj = loader.parse(json.data + "\n", path);
                 geometry = merge_geometries(obj, true);
