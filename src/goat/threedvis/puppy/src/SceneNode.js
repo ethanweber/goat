@@ -83,14 +83,24 @@ export class SceneNode {
         this.folder.domElement.prepend(this.vis_controller.domElement);
         this.vis_controller.domElement.style.height = "0";
         this.vis_controller.domElement.style.float = "right";
-        this.vis_controller.domElement.classList.add("meshcat-visibility-checkbox");
-        this.vis_controller.domElement.children[0].addEventListener("change", (evt) => {
-            if (evt.target.checked) {
-                this.folder.domElement.classList.remove("meshcat-hidden-scene-element");
-            } else {
-                this.folder.domElement.classList.add("meshcat-hidden-scene-element");
-            }
-        });
+
+        // // add on hover controls and clickable functionality
+        // // hover
+        // this.folder.domElement.addEventListener("mouseenter", function (event) {
+        //     event.target.style.color = "purple";
+        // }, false);
+        // this.folder.domElement.addEventListener("mouseleave", function (event) {
+        //     event.target.style.color = "";
+        // }, false);
+
+        // // click
+        // this.folder.domElement.addEventListener("dblclick", () => this.printValue(), false);
+    }
+
+    printValue() {
+        console.log("calling print value");
+        console.log(this.object);
+        console.log(this);
     }
 
     set_property(property, value) {

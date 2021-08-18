@@ -249,6 +249,12 @@ export class ExtensibleObjectLoader extends THREE.ObjectLoader {
             if (json.layers !== undefined) object.layers.mask = json.layers;
 
             return object;
+        } else if (json.type == "CameraHelper") {
+            console.log("processing CameraHelper");
+            console.log(json);
+            console.log(geometries);
+            console.log(materials);
+            return super.parseObject(json, geometries, materials);
         } else {
             return super.parseObject(json, geometries, materials);
         }

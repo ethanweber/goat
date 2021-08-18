@@ -47,7 +47,6 @@ class App extends Component {
     }
 
     componentDidMount() {
-        this.state.viewer = new Viewer();
         let endpoint = websocket_endpoint_from_url(window.location.href);
         this.state.client = new WebSocket("ws://" + endpoint + "/");
         this.state.client.binaryType = "arraybuffer";

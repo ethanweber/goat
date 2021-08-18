@@ -1,0 +1,1 @@
+jupyter lab --ip 0.0.0.0 --port 8889 --no-browser --config goat/configs/jupyter.py

@@ -24,6 +24,9 @@ from .coco_dataset import COCODataset
 # https://stackoverflow.com/questions/35595766/matplotlib-line-magic-causes-syntaxerror-in-python-script
 # This gets reference to the InteractiveShell instance
 from IPython import get_ipython
-get_ipython().run_line_magic('load_ext', 'autoreload')
-get_ipython().run_line_magic('autoreload', '2')
-get_ipython().run_line_magic('matplotlib', 'inline')
+try:
+    get_ipython().run_line_magic('load_ext', 'autoreload')
+    get_ipython().run_line_magic('autoreload', '2')
+    get_ipython().run_line_magic('matplotlib', 'inline')
+except:
+    pass

@@ -18,6 +18,7 @@ import numpy as np
 
 import meshcat
 import meshcat.geometry as g
+import meshcat.cameras as c
 import meshcat.transformations as tf
 
 
@@ -27,7 +28,8 @@ class VisualizerTest(unittest.TestCase):
 
         if "CI" in os.environ:
             port = self.vis.url().split(":")[-1].split("/")[0]
-            self.dummy_proc = subprocess.Popen([sys.executable, "-m", "meshcat.tests.dummy_websocket_client", str(port)])
+            self.dummy_proc = subprocess.Popen(
+                [sys.executable, "-m", "meshcat.tests.dummy_websocket_client", str(port)])
         else:
             self.vis.open()
             self.dummy_proc = None
@@ -66,21 +68,25 @@ class TestDrawing(VisualizerTest):
             g.ObjMeshGeometry.from_file(os.path.join(meshcat.viewer_assets_path(), "data/head_multisense.obj")),
             g.MeshLambertMaterial(
                 map=g.ImageTexture(
-                    image=g.PngImage.from_file(os.path.join(meshcat.viewer_assets_path(), "data/HeadTextureMultisense.png"))
+                    image=g.PngImage.from_file(os.path.join(
+                        meshcat.viewer_assets_path(), "data/HeadTextureMultisense.png"))
                 )
             )
         ))
         v.set_transform(tf.translation_matrix([0, 0.5, 0.5]))
 
         v = self.vis["meshes/convex"]
-        v["obj"].set_object(g.Mesh(g.ObjMeshGeometry.from_file(os.path.join(meshcat.viewer_assets_path(), "../tests/data/mesh_0_convex_piece_0.obj"))))
-        v["stl_ascii"].set_object(g.Mesh(g.StlMeshGeometry.from_file(os.path.join(meshcat.viewer_assets_path(), "../tests/data/mesh_0_convex_piece_0.stl_ascii"))))
+        v["obj"].set_object(g.Mesh(g.ObjMeshGeometry.from_file(os.path.join(
+            meshcat.viewer_assets_path(), "../tests/data/mesh_0_convex_piece_0.obj"))))
+        v["stl_ascii"].set_object(g.Mesh(g.StlMeshGeometry.from_file(os.path.join(
+            meshcat.viewer_assets_path(), "../tests/data/mesh_0_convex_piece_0.stl_ascii"))))
         v["stl_ascii"].set_transform(tf.translation_matrix([0, -0.5, 0]))
-        v["stl_binary"].set_object(g.Mesh(g.StlMeshGeometry.from_file(os.path.join(meshcat.viewer_assets_path(), "../tests/data/mesh_0_convex_piece_0.stl_binary"))))
+        v["stl_binary"].set_object(g.Mesh(g.StlMeshGeometry.from_file(os.path.join(
+            meshcat.viewer_assets_path(), "../tests/data/mesh_0_convex_piece_0.stl_binary"))))
         v["stl_binary"].set_transform(tf.translation_matrix([0, -1, 0]))
-        v["dae"].set_object(g.Mesh(g.DaeMeshGeometry.from_file(os.path.join(meshcat.viewer_assets_path(), "../tests/data/mesh_0_convex_piece_0.dae"))))
+        v["dae"].set_object(g.Mesh(g.DaeMeshGeometry.from_file(os.path.join(
+            meshcat.viewer_assets_path(), "../tests/data/mesh_0_convex_piece_0.dae"))))
         v["dae"].set_transform(tf.translation_matrix([0, -1.5, 0]))
-
 
         v = self.vis["points"]
         v.set_transform(tf.translation_matrix([0, 2, 0]))
@@ -101,11 +107,13 @@ class TestDrawing(VisualizerTest):
         v["line_loop"].set_object(g.LineLoop(g.PointsGeometry(vertices)))
         v["line_loop"].set_transform(tf.translation_matrix([0, 2, 0]))
 
-        v["line_loop_with_material"].set_object(g.LineLoop(g.PointsGeometry(vertices), g.LineBasicMaterial(color=0xff0000)))
+        v["line_loop_with_material"].set_object(g.LineLoop(
+            g.PointsGeometry(vertices), g.LineBasicMaterial(color=0xff0000)))
         v["line_loop_with_material"].set_transform(tf.translation_matrix([0, 3, 0]))
 
         colors = vertices  # Color each line by treating its xyz coordinates as RGB colors
-        v["line_with_vertex_colors"].set_object(g.Line(g.PointsGeometry(vertices, colors), g.LineBasicMaterial(vertexColors=True)))
+        v["line_with_vertex_colors"].set_object(g.Line(g.PointsGeometry(
+            vertices, colors), g.LineBasicMaterial(vertexColors=True)))
         v["line_with_vertex_colors"].set_transform(tf.translation_matrix([0, 4, 0]))
 
         v["triad"].set_object(g.LineSegments(
@@ -114,9 +122,9 @@ class TestDrawing(VisualizerTest):
                 [0, 0, 0], [0, 1, 0],
                 [0, 0, 0], [0, 0, 1]]).astype(np.float32).T,
                 color=np.array([
-                [1, 0, 0], [1, 0.6, 0],
-                [0, 1, 0], [0.6, 1, 0],
-                [0, 0, 1], [0, 0.6, 1]]).astype(np.float32).T
+                    [1, 0, 0], [1, 0.6, 0],
+                    [0, 1, 0], [0.6, 1, 0],
+                    [0, 0, 1], [0, 0.6, 1]]).astype(np.float32).T
             ),
             g.LineBasicMaterial(vertexColors=True)))
         v["triad"].set_transform(tf.translation_matrix(([0, 5, 0])))
@@ -184,7 +192,8 @@ class TestStandaloneServer(unittest.TestCase):
 
         if "CI" in os.environ:
             port = self.vis.url().split(":")[-1].split("/")[0]
-            self.dummy_proc = subprocess.Popen([sys.executable, "-m", "meshcat.tests.dummy_websocket_client", str(port)])
+            self.dummy_proc = subprocess.Popen(
+                [sys.executable, "-m", "meshcat.tests.dummy_websocket_client", str(port)])
         else:
             # self.vis.open()
             self.dummy_proc = None
@@ -213,7 +222,7 @@ class TestAnimation(VisualizerTest):
         with animation.at_frame(v, 0) as frame_vis:
             frame_vis.set_transform(tf.translation_matrix([0, 0, 0]))
         with animation.at_frame(v, 30) as frame_vis:
-            frame_vis.set_transform(tf.translation_matrix([2, 0, 0]).dot(tf.rotation_matrix(np.pi/2, [0, 0, 1])))
+            frame_vis.set_transform(tf.translation_matrix([2, 0, 0]).dot(tf.rotation_matrix(np.pi / 2, [0, 0, 1])))
         v.set_animation(animation)
 
 
@@ -227,7 +236,7 @@ class TestCameraAnimation(VisualizerTest):
         with animation.at_frame(v, 0) as frame_vis:
             frame_vis.set_transform(tf.translation_matrix([0, 0, 0]))
         with animation.at_frame(v, 30) as frame_vis:
-            frame_vis.set_transform(tf.translation_matrix([2, 0, 0]).dot(tf.rotation_matrix(np.pi/2, [0, 0, 1])))
+            frame_vis.set_transform(tf.translation_matrix([2, 0, 0]).dot(tf.rotation_matrix(np.pi / 2, [0, 0, 1])))
         with animation.at_frame(v, 0) as frame_vis:
             frame_vis["/Cameras/default/rotated/<object>"].set_property("zoom", "number", 1)
         with animation.at_frame(v, 30) as frame_vis:
@@ -258,7 +267,7 @@ class TestTriangularMesh(VisualizerTest):
         numpy arrays
         """
         v = self.vis["triangular_mesh"]
-        v.set_transform(tf.rotation_matrix(np.pi/2, [0., 0, 1]))
+        v.set_transform(tf.rotation_matrix(np.pi / 2, [0., 0, 1]))
         vertices = np.array([
             [0, 0, 0],
             [1, 0, 0],
@@ -279,7 +288,7 @@ class TestOrthographicCamera(VisualizerTest):
         """
         self.vis.set_object(g.Box([0.5, 0.5, 0.5]))
 
-        camera = g.OrthographicCamera(
+        camera = c.OrthographicCamera(
             left=-1, right=1, bottom=-1, top=1, near=-1000, far=1000)
         self.vis['/Cameras/default/rotated'].set_object(camera)
         self.vis['/Cameras/default'].set_transform(

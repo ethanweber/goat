@@ -22,6 +22,9 @@ class SceneElement(object):
     def __init__(self):
         self.uuid = unicode(uuid.uuid1())
 
+    def intrinsic_transform(self):
+        return tf.identity_matrix()
+
 
 class ReferenceSceneElement(SceneElement):
     def lower_in_object(self, object_data):
@@ -31,9 +34,6 @@ class ReferenceSceneElement(SceneElement):
 
 class Geometry(ReferenceSceneElement):
     field = "geometries"
-
-    def intrinsic_transform(self):
-        return tf.identity_matrix()
 
 
 class Material(ReferenceSceneElement):
@@ -50,7 +50,7 @@ class Image(ReferenceSceneElement):
 
 class Box(Geometry):
     def __init__(self, lengths):
-        super(Box, self).__init__()
+        super().__init__()
         self.lengths = lengths
 
     def lower(self, object_data):
@@ -65,7 +65,7 @@ class Box(Geometry):
 
 class Sphere(Geometry):
     def __init__(self, radius):
-        super(Sphere, self).__init__()
+        super().__init__()
         self.radius = radius
 
     def lower(self, object_data):
@@ -85,7 +85,7 @@ class Ellipsoid(Sphere):
     """
 
     def __init__(self, radii):
-        super(Ellipsoid, self).__init__(1.0)
+        super().__init__(1.0)
         self.radii = radii
 
     def intrinsic_transform(self):
@@ -94,7 +94,7 @@ class Ellipsoid(Sphere):
 
 class PlaneGeometry(Geometry):
     def __init__(self, lengths):
-        super(PlaneGeometry, self).__init__()
+        super().__init__()
         self.lengths = lengths
 
     def lower(self, object_data):
@@ -114,7 +114,7 @@ rotational symmetry is aligned with the y-axis.
 
 class Cylinder(Geometry):
     def __init__(self, height, radius=1.0, radiusTop=None, radiusBottom=None):
-        super(Cylinder, self).__init__()
+        super().__init__()
         if radiusTop is not None and radiusBottom is not None:
             self.radiusTop = radiusTop
             self.radiusBottom = radiusBottom
@@ -136,14 +136,19 @@ class Cylinder(Geometry):
 
 
 class GenericMaterial(Material):
-    def __init__(self, color=0xffffff, reflectivity=0.5, map=None,
-                 side=2, transparent=None, opacity=1.0,
+    def __init__(self,
+                 color=0xffffff,
+                 reflectivity=0.5,
+                 map=None,
+                 side=2,
+                 transparent=None,
+                 opacity=1.0,
                  linewidth=1.0,
                  wireframe=False,
                  wireframeLinewidth=1.0,
                  vertexColors=False,
                  **kwargs):
-        super(GenericMaterial, self).__init__()
+        super().__init__()
         self.color = color
         self.reflectivity = reflectivity
         self.map = map
@@ -160,7 +165,7 @@ class GenericMaterial(Material):
         # Three.js allows a material to have an opacity which is != 1,
         # but to still be non-transparent, in which case the opacity only
         # serves to desaturate the material's color. That's a pretty odd
-        # combination of things to want, so by default we juse use the
+        # combination of things to want, so by default we just use the
         # opacity value to decide whether to set transparent to True or
         # False.
         if self.transparent is None:
@@ -208,7 +213,7 @@ class LineBasicMaterial(GenericMaterial):
 
 class PngImage(Image):
     def __init__(self, data):
-        super(PngImage, self).__init__()
+        super().__init__()
         self.data = data
 
     @staticmethod
@@ -225,7 +230,7 @@ class PngImage(Image):
 
 class GenericTexture(Texture):
     def __init__(self, properties):
-        super(GenericTexture, self).__init__()
+        super().__init__()
         self.properties = properties
 
     def lower(self, object_data):
@@ -239,7 +244,7 @@ class GenericTexture(Texture):
 
 class ImageTexture(Texture):
     def __init__(self, image, wrap=[1001, 1001], repeat=[1, 1], **kwargs):
-        super(ImageTexture, self).__init__()
+        super().__init__()
         self.image = image
         self.wrap = wrap
         self.repeat = repeat
@@ -258,7 +263,7 @@ class ImageTexture(Texture):
 
 class Object(SceneElement):
     def __init__(self, geometry, material=MeshPhongMaterial()):
-        super(Object, self).__init__()
+        super().__init__()
         self.geometry = geometry
         self.material = material
 
@@ -285,34 +290,6 @@ class Object(SceneElement):
 
 class Mesh(Object):
     _type = u"Mesh"
-
-
-class OrthographicCamera(SceneElement):
-    def __init__(self, left, right, top, bottom, near, far, zoom=1):
-        super(OrthographicCamera, self).__init__()
-        self.left = left
-        self.right = right
-        self.top = top
-        self.bottom = bottom
-        self.near = near
-        self.far = far
-        self.zoom = zoom
-
-    def lower(self):
-        data = {
-            u"object": {
-                u"uuid": self.uuid,
-                u"type": u"OrthographicCamera",
-                u"left": self.left,
-                u"right": self.right,
-                u"top": self.top,
-                u"bottom": self.bottom,
-                u"near": self.near,
-                u"far": self.far,
-                u"zoom": self.zoom,
-            }
-        }
-        return data
 
 
 def item_size(array):
@@ -365,7 +342,7 @@ def data_from_stream(stream):
 
 class MeshGeometry(Geometry):
     def __init__(self, contents, mesh_format):
-        super(MeshGeometry, self).__init__()
+        super().__init__()
         self.contents = contents
         self.mesh_format = mesh_format
 
@@ -380,7 +357,7 @@ class MeshGeometry(Geometry):
 
 class ObjMeshGeometry(MeshGeometry):
     def __init__(self, contents):
-        super(ObjMeshGeometry, self, contents, u"obj").__init__()
+        super().__init__(contents, u"obj")
 
     @staticmethod
     def from_file(fname):
@@ -394,7 +371,7 @@ class ObjMeshGeometry(MeshGeometry):
 
 class DaeMeshGeometry(MeshGeometry):
     def __init__(self, contents):
-        super(DaeMeshGeometry, self, contents, u"dae").__init__()
+        super().__init__(contents, u"dae")
 
     @staticmethod
     def from_file(fname):
@@ -408,7 +385,7 @@ class DaeMeshGeometry(MeshGeometry):
 
 class StlMeshGeometry(MeshGeometry):
     def __init__(self, contents):
-        super(StlMeshGeometry, self, contents, u"stl").__init__()
+        super().__init__(contents, u"stl")
 
     @staticmethod
     def from_file(fname):
@@ -436,7 +413,7 @@ class StlMeshGeometry(MeshGeometry):
 
 class PlyMeshGeometry(MeshGeometry):
     def __init__(self, contents):
-        super(PlyMeshGeometry, self, contents, u"ply").__init__()
+        super().__init__(contents, u"ply")
 
     @staticmethod
     def from_file(fname):
@@ -484,7 +461,7 @@ class TriangularMeshGeometry(Geometry):
     __slots__ = ["vertices", "faces"]
 
     def __init__(self, vertices, faces):
-        super(TriangularMeshGeometry, self).__init__()
+        super().__init__()
 
         vertices = np.asarray(vertices, dtype=np.float32)
         faces = np.asarray(faces, dtype=np.uint32)
@@ -508,7 +485,7 @@ class TriangularMeshGeometry(Geometry):
 
 class PointsGeometry(Geometry):
     def __init__(self, position, color=None):
-        super(PointsGeometry, self).__init__()
+        super().__init__()
         self.position = position
         self.color = color
 
@@ -526,10 +503,11 @@ class PointsGeometry(Geometry):
 
 
 class PointsMaterial(Material):
-    def __init__(self, size=0.001, color=0xffffff):
-        super(PointsMaterial, self).__init__()
+    def __init__(self, size=0.001, color=0xffffff, sizeAttenuation=True):
+        super().__init__()
         self.size = size
         self.color = color
+        self.sizeAttenuation = sizeAttenuation
 
     def lower(self, object_data):
         return {
@@ -537,6 +515,7 @@ class PointsMaterial(Material):
             u"type": u"PointsMaterial",
             u"color": self.color,
             u"size": self.size,
+            u"sizeAttenuation": bool(self.sizeAttenuation),
             u"vertexColors": 2
         }
 
@@ -576,11 +555,11 @@ def triad(scale=1.0):
             [0, 0, 0], [scale, 0, 0],
             [0, 0, 0], [0, scale, 0],
             [0, 0, 0], [0, 0, scale]]).astype(np.float32).T,
-                       color=np.array([
+            color=np.array([
                            [1, 0, 0], [1, 0.6, 0],
                            [0, 1, 0], [0.6, 1, 0],
                            [0, 0, 1], [0, 0.6, 1]]).astype(np.float32).T
-                       ),
+        ),
         LineBasicMaterial(vertexColors=True))
 
 
@@ -596,9 +575,9 @@ def camera(scale=1.0):
             [0, 0, 0], [scale, 0, 0],
             [0, 0, 0], [0, scale, 0],
             [0, 0, 0], [0, 0, scale]]).astype(np.float32).T,
-                       color=np.array([
+            color=np.array([
                            [1, 0, 0], [1, 0.6, 0],
                            [0, 1, 0], [0.6, 1, 0],
                            [0, 0, 1], [0, 0.6, 1]]).astype(np.float32).T
-                       ),
+        ),
         LineBasicMaterial(vertexColors=True))

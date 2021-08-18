@@ -11,7 +11,7 @@ from collections import defaultdict
 import cv2
 from PIL import Image, ImageDraw, ImageFont
 from PIL import ImagePath
-from .edit.utils import (
+from .edit_utils import (
     get_polygons_from_mask,
     draw_polygon_on_image,
     get_image_with_mask_overlayed,

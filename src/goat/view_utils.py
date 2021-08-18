@@ -13,7 +13,7 @@ import matplotlib.animation as animation
 import numpy as np
 import urllib
 
-from goat import edit_utils
+from . import edit_utils
 
 
 def get_image_grid(

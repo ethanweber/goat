@@ -55,3 +55,4 @@ def make_dir(filename_or_folder):
         except Exception as e:
             print(f"Couldn't create folder: {folder}. Maybe due to a parallel process?")
             print(e)
+    return filename_or_folder

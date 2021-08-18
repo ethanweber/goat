@@ -10,14 +10,14 @@ import zmq
 from IPython.display import HTML
 
 from .path import Path
-from .commands import SetObject, SetTransform, Delete, SetProperty, SetAnimation
+from .commands import SetObject, SetTransform, Delete, SetProperty, SetAnimation, SetCamera
 from .geometry import MeshPhongMaterial
 
 
 class ViewerWindow(object):
     context = zmq.Context()
 
-    def __init__(self, zmq_url="tcp://0.0.0.0:6004"):
+    def __init__(self, zmq_url="tcp://0.0.0.0:6000"):
         # self.client = socketio.Client()
         # self.client.connect('https://recon.ethanweber.me')
         self.zmq_url = zmq_url
@@ -32,10 +32,6 @@ class ViewerWindow(object):
             umsgpack.packb(cmd_data)
         ])
         self.client.recv()
-        # cmd_data = umsgpack.packb(cmd_data)
-        # self.client.emit('command', cmd_data)
-        # cmd_data = umsgpack.packb(cmd_data)
-        # self.client.send(cmd_data)
 
 
 class Visualizer(object):
@@ -48,6 +44,7 @@ class Visualizer(object):
         else:
             self.window = window
         self.path = Path(("meshcat",))
+        # self.path = Path(())
 
     @staticmethod
     def view_into(window, path):
@@ -69,6 +66,9 @@ class Visualizer(object):
 
     def set_animation(self, animation, play=True, repetitions=1):
         return self.window.send(SetAnimation(animation, play=play, repetitions=repetitions))
+
+    def set_camera(self, path):
+        return self.window.send(SetCamera(self.path))
 
     def delete(self):
         return self.window.send(Delete(self.path))
