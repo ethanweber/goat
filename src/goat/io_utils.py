@@ -16,6 +16,7 @@ def write_to_json(filename: str, content: dict):
     with open(filename, "w") as f:
         json.dump(content, f)
 
+
 def load_from_pkl(filename: str):
     assert filename.endswith(".pkl")
     with open(filename, "rb") as f:
@@ -26,6 +27,7 @@ def write_to_pkl(filename: str, content):
     assert filename.endswith(".pkl")
     with open(filename, "wb") as f:
         pickle.dump(content, f)
+
 
 def get_project_root() -> Path:
     return Path(__file__).parent.parent.absolute()

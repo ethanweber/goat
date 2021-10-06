@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import numpy as np
 import urllib
+import imageio
 
 from . import edit_utils
 
@@ -50,7 +51,6 @@ def get_html_from_image_urls(image_urls):
             image_url)
     return html_str
 
-
 def get_html_from_image(image,
                         height=None,
                         width=None,
@@ -86,7 +86,7 @@ def get_html_from_image(image,
     html_label_str = "" if label is None else """<div style="text-align: center">{}</div>""".format(
         label)
     html_div = """
-        <div style="display: inline-block">
+        <div style="display: inline-block; border-style: solid; margin: 1px">
             {} 
             <div style="text-align: center">{}</div>
         </div>

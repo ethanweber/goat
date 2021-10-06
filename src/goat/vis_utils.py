@@ -33,14 +33,17 @@ def get_random_color():
 # ----------
 
 
-def show_data(vis, data, name=None):
+def show_data(vis, data, name=None, depth_version="Z"):
     """Show a data point, which is an image and depth map, in the 3D viewer.
     Note there should be no batch dimension and the inputs should be torch values.
     Args:
         vis:
         data:
+            image: (3, H, W), 0-1
+            K: intrinsics
         name:
     """
+    assert depth_version in ["Z", "ray"]
 
     d = copy.deepcopy(data)
     # convert data to numpy
@@ -49,11 +52,18 @@ def show_data(vis, data, name=None):
             d[key] = d[key].detach().cpu().numpy()
 
     image = (d["image"] * 255).astype("uint8").transpose((1, 2, 0))
-    points, colors, _ = edit_utils.get_camera_points(
-        d["depth"],
-        d["intrinsics"],
-        image=image
-    )
+    if depth_version == "Z":
+        points, colors, _ = edit_utils.get_camera_points(
+            d["depth"],
+            d["K"],
+            image=image
+        )
+    elif depth_version == "ray":
+        points, colors, _ = edit_utils.get_camera_points_from_raydepth(
+            d["depth"],
+            d["K"],
+            image=image
+        )
     vis[name].set_object(g.camera())
     vis[name].set_transform(d["pose"].astype("float64"))
     vis["{}/points".format(name)].set_object(
@@ -194,15 +204,18 @@ def draw_camera_frustum(vis,
                         pp_h=None):
     """Draw the camera in the scene.
     """
-
     full_name_str = "/Images/{}/rotated".format(name)
 
     width = 2.0 * (pp_w / focal_length) * displayed_focal_length
     height = 2.0 * (pp_h / focal_length) * displayed_focal_length
 
-    # draw the frustum
-    g_frustum = c.frustum(scale=1.0, focal_length=displayed_focal_length, width=width, height=height)
-    vis[full_name_str + "/frustum"].set_object(g_frustum)
+    print(width)
+    print(height)
+
+    # # draw the frustum
+    # g_frustum = c.frustum(scale=1.0, focal_length=displayed_focal_length, width=width, height=height)
+    # print(g_frustum)
+    # vis[full_name_str + "/frustum"].set_object(g_frustum)
 
     # draw the image plane
     g_image_plane = c.ImagePlane(image, width=width, height=height)
@@ -226,7 +239,6 @@ def set_camera_render(vis, intrinsics=None, pose=None, name="renderer"):
     """Place a three.js camera in the scene.
     This can be used to render an image from.
     """
-
     full_name_str = f"/Cameras/{name}/rotated"
     g_camera = c.PerspectiveCamera(fov=120, aspect=1.0, near=0.01, far=1000)
     g_camera_helper = c.CameraHelper(g_camera)

@@ -7,6 +7,11 @@ import cv2
 from scipy.spatial.distance import euclidean as Euc
 from scipy.spatial.transform import Rotation as R
 
+from torchgeometry.core import (
+    convert_points_from_homogeneous,
+    convert_points_to_homogeneous
+)
+
 
 # TODO(ethan): clean this up properly, since it's currently copy pasted without much thought
 
@@ -207,6 +212,43 @@ def get_camera_points(depth,
     points = np.transpose(np.linalg.inv(intrinsics) @ np.transpose(points))
     return points, colors, index_to_x_y
 
+def get_camera_points_from_raydepth(depth, intrinsics, image=None):
+    """Depth is defined along the ray, not Z.
+    https://medium.com/yodayoda/from-depth-map-to-point-cloud-7473721d3f
+    https://gist.githubusercontent.com/cbaus/6e04f7fe5355f67a90e99d7be0563e88/raw/883db511cf67e9898f3e8959ef2c55ad1848e8b0/convert.py
+    """
+    points = []
+    colors = []
+    index_to_x_y = []
+
+    height, width = depth.shape[:2]
+    depths = []
+    # TODO: use meshgrid(?) or faster method
+    for j in range(height):
+        for i in range(width):
+            d = depth[j, i]
+            if d == 0:
+                # TODO: don't project if the depth is 0
+                # d = 10000
+                continue
+            depths.append(d)
+            points.append(
+                [i, j, 1]
+            )
+            color = image[j, i] if image is not None else [0, 0, 0]
+            colors.append(color)
+            index_to_x_y.append(
+                (i, j)
+            )
+
+    points = np.array(points)
+    colors = np.array(colors)
+    depths = np.array(depths)
+    points = np.transpose(np.linalg.inv(intrinsics) @ np.transpose(points))
+    denominator = np.sum(points**2.0, axis=1) ** 0.5
+    Z = depths / denominator
+    XYZ = points * Z[:, None]
+    return XYZ, colors, index_to_x_y
 
 def points_to_world(points, pose):
     """points.shape == (X, 3)"""
@@ -239,4 +281,14 @@ def get_normalized(x):
     """
     x = (x - x.min())
     x /= x.max()
+    return x
+
+
+def pose_to_homogeneous(pose):
+    """Doesn't work for batch shape.
+    """
+    assert pose.shape == (3, 4)
+    row = torch.zeros_like(pose[0:1])
+    row[0, 3] = 1.0
+    x = torch.cat([pose, row], dim=0)
     return x

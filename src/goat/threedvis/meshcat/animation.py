@@ -111,6 +111,7 @@ class AnimationFrameVisualizer(object):
         return self.animation.clips[self.path]
 
     def set_transform(self, matrix):
+        assert matrix.shape == (4, 4)
         clip = self.get_clip()
         clip.set_property(self.current_frame, u"position", u"vector3", js_position(matrix))
         clip.set_property(self.current_frame, u"quaternion", u"quaternion", js_quaternion(matrix))
@@ -138,7 +139,8 @@ def convert_frames_to_video(tar_file_path, output_path="output.mp4", framerate=6
     """
     output_path = os.path.abspath(output_path)
     if os.path.isfile(output_path) and not overwrite:
-        raise ValueError("The output path {:s} already exists. To overwrite that file, you can pass overwrite=True to this function.".format(output_path))
+        raise ValueError(
+            "The output path {:s} already exists. To overwrite that file, you can pass overwrite=True to this function.".format(output_path))
     with tempfile.TemporaryDirectory() as tmp_dir:
         with tarfile.open(tar_file_path) as tar:
             tar.extractall(tmp_dir)
@@ -163,6 +165,3 @@ ffmpeg -r 60 -i %07d.png \\\n\t -vcodec libx264 \\\n\t -preset slow \\\n\t -crf 
             raise
     print("Saved output as {:s}".format(output_path))
     return output_path
-
-
-

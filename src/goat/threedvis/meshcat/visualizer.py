@@ -59,6 +59,7 @@ class Visualizer(object):
         return self.window.send(SetObject(geometry, material, self.path))
 
     def set_transform(self, matrix=np.eye(4)):
+        assert matrix.shape == (4, 4)
         return self.window.send(SetTransform(matrix, self.path))
 
     def set_property(self, key, value):
