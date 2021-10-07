@@ -8,3 +8,14 @@ from . import utils
 from . import view_utils
 from . import vis_utils
 from . import plotly_utils
+
+# Expose package functionality to top level
+
+from goat.io_utils import (
+    pjoin
+)
+
+from goat.view_utils import (
+    imshow,
+    show_images
+)

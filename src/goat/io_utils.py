@@ -29,11 +29,23 @@ def write_to_pkl(filename: str, content):
         pickle.dump(content, f)
 
 
-def get_project_root() -> Path:
-    return Path(__file__).parent.parent.absolute()
+# def get_project_root() -> Path:
+#     return Path(__file__).parent.parent.absolute()
 
 
-def get_absolute_path(path):
+def get_git_root(path, dirs=(".git",), default=None):
+    """https://stackoverflow.com/questions/22081209/find-the-root-of-the-git-repository-where-the-file-lives
+    """
+    import os
+    prev, test = None, os.path.abspath(path)
+    while prev != test:
+        if any(os.path.isdir(os.path.join(test, d)) for d in dirs):
+            return test
+        prev, test = test, os.path.abspath(os.path.join(test, os.pardir))
+    return default
+
+
+def get_absolute_path(path, proj_root_func=get_git_root):
     """
     Returns the full, absolute path.
     Relative paths are assumed to start at the repo directory.
@@ -41,7 +53,7 @@ def get_absolute_path(path):
     absolute_path = path
     if absolute_path[0] != "/":
         absolute_path = os.path.join(
-            get_project_root(), absolute_path
+            proj_root_func(path), absolute_path
         )
     return absolute_path
 
