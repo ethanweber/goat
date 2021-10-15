@@ -12,10 +12,19 @@ from . import plotly_utils
 # Expose package functionality to top level
 
 from goat.io_utils import (
-    pjoin
+    pjoin,
+    make_dir,
+    get_absolute_path,
+    get_git_root
 )
 
 from goat.view_utils import (
     imshow,
-    show_images
+    show_images,
+    get_tile_from_image
+)
+from goat.view_utils import show_images as imshows
+
+from goat.nb_utils import (
+    setup_ipynb
 )

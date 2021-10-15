@@ -17,6 +17,48 @@ import imageio
 from . import edit_utils
 
 
+def save_gif_from_images(gif_filename, images_in, backwards=True, fps=5):
+    """
+    filename - gif filename
+    """
+    images = images_in
+    if backwards:
+        images = images_in + images_in[::-1]
+    imageio.mimsave(gif_filename, images, fps=fps)
+
+
+def save_gif_from_image_filenames(gif_filename, image_filenames):
+    """
+    filename - gif filename
+    """
+    images = []
+    for image_filename in tqdm(image_filenames):
+        images.append(cv2.imread(image_filename)[:, :, ::-1])
+    save_gif_from_images(gif_filename, images)
+
+
+def show_gif_from_filenames(gif_filenames, labels=None, width=None):
+    html_str = ""
+    width_str = "" if width is None else """ width="{}" """.format(width)
+    for idx, gif_filename in enumerate(gif_filenames):
+        if labels:
+            html_str += """{}<br>""".format(labels[idx])
+        html_str += """<img src="{}" "{}" /><br>""".format(gif_filename, width_str)
+    display(HTML(html_str))
+    return html_str
+
+
+def get_tile_from_image(image, size, tile):
+    """Using 0 indexing.
+    size - tuple (num cols, num rols)
+    tile - tuple (desired col, desired row)
+    """
+    outer_h, outer_w, _ = image.shape
+    inner_h, inner_w = outer_h // size[0], outer_w // size[1]
+    c, r = tile
+    return image[c * inner_h:c * inner_h + inner_h, r * inner_w:r * inner_w + inner_w, :]
+
+
 def get_image_grid(
     images,
     rows=None,
@@ -50,6 +92,7 @@ def get_html_from_image_urls(image_urls):
         html_str += """<img src="{}" height="100px" width="100px">""".format(
             image_url)
     return html_str
+
 
 def get_html_from_image(image,
                         height=None,

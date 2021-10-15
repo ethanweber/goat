@@ -62,7 +62,10 @@ def make_dir(filename_or_folder):
     """Make the directory for either the filename or folder.
     Note that filename_or_folder currently needs to end in / for it to be recognized as a folder.
     """
-    folder = os.path.dirname(filename_or_folder)
+    if filename_or_folder[-1] != "/" and filename_or_folder.find(".") < 0:
+        folder = os.path.dirname(filename_or_folder + "/")
+    else:
+        folder = os.path.dirname(filename_or_folder)
     if not os.path.exists(folder):
         try:
             os.makedirs(folder)
