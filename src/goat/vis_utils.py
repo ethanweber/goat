@@ -196,21 +196,28 @@ def pair_outputs_from_outputs(outputs, b=0):
 def draw_camera_frustum(vis,
                         image=np.random.rand(100, 100, 3) * 255.0,
                         pose=tf.translation_matrix([0, 0, 0]),
+                        K=None,
                         name="0000000",
-                        colmap_format=True,
                         displayed_focal_length=0.5,
-                        focal_length=None,
-                        pp_w=None,
-                        pp_h=None):
+                        # height=1.0
+                        ):
     """Draw the camera in the scene.
     """
-    full_name_str = "/Images/{}/rotated".format(name)
+    full_name_str = "/Images/{}".format(name)
 
+    assert K[0, 0] == K[1, 1]
+    focal_length = K[0, 0]
+    pp_w = K[0, 2]
+    pp_h = K[1, 2]
+
+    # width = (pp_w / pp_h) * height
+    # print(width)
     width = 2.0 * (pp_w / focal_length) * displayed_focal_length
     height = 2.0 * (pp_h / focal_length) * displayed_focal_length
 
-    print(width)
-    print(height)
+    if pose.shape == (3, 4):
+        pose = np.concatenate([pose, np.zeros_like(pose[:1])], axis=0)
+        pose[3, 3] = 1.0
 
     # # draw the frustum
     # g_frustum = c.frustum(scale=1.0, focal_length=displayed_focal_length, width=width, height=height)
@@ -222,14 +229,14 @@ def draw_camera_frustum(vis,
     vis[full_name_str + "/image_plane"].set_object(g_image_plane)
     vis[full_name_str + "/image_plane"].set_transform(tf.translation_matrix([0, 0, -displayed_focal_length]))
 
-    if colmap_format:
-        # rotate if using the colmap camera format
-        yrot = R.from_euler('y', 180, degrees=True).as_matrix()
-        zrot = R.from_euler('z', 180, degrees=True).as_matrix()
-        rotation = yrot @ zrot
-        transform = np.eye(4)
-        transform[:3, :3] = rotation
-        vis[full_name_str].set_transform(transform)
+    # if colmap_format:
+    #     # rotate if using the colmap camera format
+    #     yrot = R.from_euler('y', 180, degrees=True).as_matrix()
+    #     zrot = R.from_euler('z', 180, degrees=True).as_matrix()
+    #     rotation = yrot @ zrot
+    #     transform = np.eye(4)
+    #     transform[:3, :3] = rotation
+    #     vis[full_name_str].set_transform(transform)
 
     # set the transform of the camera
     vis["/Images/{}".format(name)].set_transform(pose)
