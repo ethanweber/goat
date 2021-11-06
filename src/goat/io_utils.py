@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 from os.path import join as pjoin
 import pickle
-
+import yaml
 
 def load_from_json(filename: str):
     assert filename.endswith(".json")
@@ -27,6 +27,10 @@ def write_to_pkl(filename: str, content):
     assert filename.endswith(".pkl")
     with open(filename, "wb") as f:
         pickle.dump(content, f)
+
+def write_to_txt(filename: str, content):
+    with open(filename, "w") as f:
+        f.write(content)
 
 
 # def get_project_root() -> Path:

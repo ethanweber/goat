@@ -25,6 +25,9 @@ def show_box_test(vis):
     )
 
 
+""
+
+
 def get_random_color():
     color = np.random.rand(3) * 255.0
     color = tuple([int(x) for x in color])
@@ -129,12 +132,30 @@ def plot_correspondences(pair, plot=True):
     return matches_image, equal_distances_image
 
 
-def show_ply(vis, ply_path):
+def show_ply(vis, ply_path, name="ply", color=None):
     """Show the PLY file in the 3D viewer. Specify the full filename as input.
     """
-    vis["ply"].set_object(
+    assert ply_path.endswith(".ply")
+    if color:
+        material = g.MeshPhongMaterial(color=color)
+    else:
+        material = g.MeshPhongMaterial(vertexColors=True)
+    vis[name].set_object(
         g.PlyMeshGeometry.from_file(ply_path),
-        g.MeshPhongMaterial(vertexColors=True)
+        material
+    )
+
+def show_obj(vis, obj_path, name="obj", color=None):
+    """Show the PLY file in the 3D viewer. Specify the full filename as input.
+    """
+    assert obj_path.endswith(".obj")
+    if color:
+        material = g.MeshPhongMaterial(color=color)
+    else:
+        material = g.MeshPhongMaterial(vertexColors=True)
+    vis[name].set_object(
+        g.ObjMeshGeometry.from_file(obj_path),
+        material
     )
 
 
@@ -251,3 +272,33 @@ def set_camera_render(vis, intrinsics=None, pose=None, name="renderer"):
     g_camera_helper = c.CameraHelper(g_camera)
     # vis[full_name_str].set_object(g_camera)
     vis[full_name_str].set_object(g_camera_helper)
+
+def set_persp_camera(vis, pose, K, colmap=True):
+    """Assumes simple pinhole model for intrinsics.
+    Args:
+        colmap: whether to use the colmap camera coordinate convention or not
+    """
+    pose_processed = copy.deepcopy(pose)
+    if colmap:
+        pose_processed[:, 1:3] *= -1
+    vis["/Cameras/Main Camera R"].set_transform(pose_processed)
+    pp_w = K[0,2]
+    pp_h = K[1,2]
+    assert K[0,0] == K[1,1]
+    focal_length = K[0,0]
+    x = pp_h / (focal_length)
+    fov = 2.0 * np.arctan(x) * (180.0 / np.pi)
+    vis["/Cameras/Main Camera R/<object>"].set_property("fov", fov)
+    vis["/Cameras/Main Camera R/<object>"].set_property("aspect", float(pp_w / pp_h)) # three.js expects width/height
+
+def set_orth_camera(vis, pose, width, height, colmap=True):
+    """
+    """
+    pose_processed = copy.deepcopy(pose)
+    if colmap:
+        pose_processed[:, 1:3] *= -1
+    vis["/Cameras/Main Camera Orth"].set_transform(pose_processed)
+    vis["/Cameras/Main Camera Orth/<object>"].set_property("left", - width / 2.0)
+    vis["/Cameras/Main Camera Orth/<object>"].set_property("right", width / 2.0)
+    vis["/Cameras/Main Camera Orth/<object>"].set_property("top", height / 2.0)
+    vis["/Cameras/Main Camera Orth/<object>"].set_property("bottom", - height / 2.0)

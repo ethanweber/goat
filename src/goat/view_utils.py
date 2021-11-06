@@ -97,7 +97,8 @@ def get_html_from_image_urls(image_urls):
 def get_html_from_image(image,
                         height=None,
                         width=None,
-                        label=None):
+                        label=None,
+                        fontsize=None):
     """
 
     :param image: np.array
@@ -126,8 +127,11 @@ def get_html_from_image(image,
         '.jpg', resized_image[:, :, ::-1])[1]).decode()
     html_img_str = """<img src="data:image/png;base64, {}" />""".format(
         base64_string)
-    html_label_str = "" if label is None else """<div style="text-align: center">{}</div>""".format(
-        label)
+
+    html_fontsize_str = "" if fontsize is None else "; font-size: {}px".format(fontsize)
+    html_label_str = "" if label is None else """<div style="text-align: center {}">{}</div>""".format(
+        html_fontsize_str, label)
+    
     html_div = """
         <div style="display: inline-block; border-style: solid; margin: 1px">
             {} 
@@ -150,13 +154,14 @@ def show_images(images,
                 labels=None,
                 height=None,
                 width=None,
-                return_html=False):
+                return_html=False,
+                fontsize=None):
     html_div = ""
     if labels is None:
         labels = [None] * len(images)
     for image, label in zip(images, labels):
         html_div += get_html_from_image(image,
-                                        height=height, width=width, label=label)
+                                        height=height, width=width, label=label, fontsize=fontsize)
     if return_html:
         return html_div
     else:

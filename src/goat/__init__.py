@@ -17,7 +17,9 @@ from goat.io_utils import (
     get_absolute_path,
     get_git_root,
     load_from_json,
-    write_to_json
+    write_to_json,
+    load_from_pkl,
+    write_to_pkl
 )
 from goat.io_utils import get_absolute_path as abs_path
 
