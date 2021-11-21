@@ -139,3 +139,18 @@ def listdir(folder, prepend_folder=False, extension=None, type=None):
 
 def get_hostname():
     return socket.gethostname()
+
+
+def stop():
+    import sys
+    print("called goat.stop()")
+    sys.exit()
+
+def pose_to_homo(pose):
+    """TODO(ethan): write this for torch too
+    """
+    if pose.shape == (3, 4):
+        pose = np.concatenate([pose, np.zeros_like(pose[:1])], -2)
+        pose[3, 3] = 1
+    assert pose.shape == (4,4)
+    return pose

@@ -36,6 +36,7 @@ def get_scatter3d(x, y, z, colors=None, name=None, size=2, opacity=1.0):
         )
     )
 
+# def get_hist()
 
 def get_lines_for_axis(T, length=1.0):
     """T is the transormation to apply.

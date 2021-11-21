@@ -29,7 +29,6 @@ function findCameraObjectUnderObject3D(object) {
     return null;
 }
 
-
 var msgpack = require("msgpack-lite");
 
 export class Viewer extends Component {
@@ -43,7 +42,9 @@ export class Viewer extends Component {
             scene_tree: null,
             needs_render: true,
             viewport_width: null,
-            viewport_height: null
+            viewport_height: null,
+            images: [],
+            image_index: 0
         }
         this.animate = this.animate.bind(this);
         this.set_object = this.set_object.bind(this);
@@ -61,11 +62,12 @@ export class Viewer extends Component {
         this.state.viewport_width = this.getViewportWidth();
         this.state.viewport_height = this.getViewportHeight();
         this.state.camera_l.aspect = this.state.viewport_width / this.state.viewport_height;
-        // this.state.camera_r.aspect = this.state.viewport_width / (this.state.viewport_height / 2);
         this.state.camera_l.updateProjectionMatrix();
         this.state.camera_r.updateProjectionMatrix();
+        this.state.camera_orth.updateProjectionMatrix();
         this.state.renderer_l.setSize(this.state.viewport_width, this.state.viewport_height);
         this.state.renderer_r.setSize(this.state.viewport_width, (this.state.viewport_height / 2));
+        this.state.renderer_orth.setSize(this.state.viewport_width, (this.state.viewport_height / 2));
     }
 
     animate() {
@@ -74,15 +76,48 @@ export class Viewer extends Component {
             this.handleResize();
             let camera_l = findCameraObjectUnderObject3D(this.state.scene_tree.find(["Cameras", "Main Camera L"]).object);
             let camera_r = findCameraObjectUnderObject3D(this.state.scene_tree.find(["Cameras", "Main Camera R"]).object);
+            let camera_orth = findCameraObjectUnderObject3D(this.state.scene_tree.find(["Cameras", "Main Camera Orth"]).object);
+            // console.log(camera_orth);
             camera_l.updateProjectionMatrix();
             camera_r.updateProjectionMatrix();
+            camera_orth.updateProjectionMatrix();
             if (this.state.controls_l != null) { this.state.controls_l.update(); }
             if (this.state.controls_r != null) { this.state.controls_r.update(); }
+            if (this.state.controls_orth != null) { this.state.controls_orth.update(); }
             this.state.renderer_l.render(this.state.scene, camera_l);
             this.state.renderer_r.render(this.state.scene, camera_r);
+
+            // this.state.renderer_save.render(this.state.scene, camera_r);
+            // let getImageData = true;
+            // if (getImageData == true) {
+            //     let imgData = this.state.renderer_save.domElement.toDataURL();
+            //     console.log(imgData);
+            //     getImageData = false;
+            // }
+            this.state.renderer_orth.render(this.state.scene, camera_orth);
             this.state.needs_render = false;
             this.set_dirty(); // TODO(ethan): remove this but make sure to include it everywhere
         }
+    }
+
+    save_image(image) {
+        let url = 'https://friends.ethanweber.me/save_image';
+        let data = {
+            index: this.state.image_index,
+            image: image,
+        };
+        fetch(url, {
+                method: 'POST', // The method
+                mode: 'no-cors', // It can be no-cors, cors, same-origin
+                headers: {
+                    'Content-Type': 'application/json', // Your headers
+                },
+                body: JSON.stringify(data),
+            })
+            .then((returned) => {
+                console.log(returned);
+            });
+        this.state.image_index += 1;
     }
 
     set_object(path, object) {
@@ -180,16 +215,22 @@ export class Viewer extends Component {
             console.log("setting camera");
         }
         this.set_dirty();
+
+        if (cmd.type === "set_transform" && cmd.path === "/Cameras/Main Camera R") {
+            let camera_r = findCameraObjectUnderObject3D(this.state.scene_tree.find(["Cameras", "Main Camera R"]).object);
+            camera_r.updateProjectionMatrix();
+            this.state.renderer_save.render(this.state.scene, camera_r);
+            let imgData = this.state.renderer_save.domElement.toDataURL();
+            this.state.images.push(imgData.toString());
+            this.save_image(imgData);
+        }
     }
 
-    save_scene() {
-    }
+    save_scene() {}
 
-    load_scene() {
-    }
+    load_scene() {}
 
-    save_image() {
-    }
+    // save_image() {}
 
     add_camera_helper(path, camera) {
         let camera_copy = camera.clone();
@@ -236,11 +277,30 @@ export class Viewer extends Component {
         this.mount.appendChild(this.state.renderer_l.domElement);
 
         // Renderer Right
+        let div = document.createElement("div");
         this.state.renderer_r = new THREE.WebGLRenderer({ antialias: true });
         this.state.renderer_r.setPixelRatio(window.devicePixelRatio);
         this.state.renderer_r.setSize(this.state.viewport_height, this.state.viewport_height / 2);
         this.state.renderer_r.domElement.style.border = "1px solid black";
-        this.mount.appendChild(this.state.renderer_r.domElement);
+        div.appendChild(this.state.renderer_r.domElement);
+
+        this.state.renderer_orth = new THREE.WebGLRenderer({ antialias: true });
+        this.state.renderer_orth.setPixelRatio(window.devicePixelRatio);
+        this.state.renderer_orth.setSize(this.state.viewport_height, this.state.viewport_height / 2);
+        this.state.renderer_orth.domElement.style.border = "1px solid black";
+        div.appendChild(this.state.renderer_orth.domElement);
+        // div.display.style = "relative";
+
+        this.state.renderer_save = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+        this.state.renderer_save.setPixelRatio(1.0);
+        this.state.renderer_save.setSize(960, 540);
+        this.state.renderer_save.domElement.style.border = "1px solid black";
+        this.state.renderer_save.domElement.style.display = "none";
+        div.appendChild(this.state.renderer_save.domElement);
+
+        this.mount.appendChild(div);
+
+        console.log(this.mount);
 
         this.mount.style.display = "flex";
 
@@ -262,7 +322,8 @@ export class Viewer extends Component {
         this.state.controls_l.update();
 
         // Camera right
-        this.state.camera_r = new THREE.PerspectiveCamera(120, this.state.viewport_width / (this.state.viewport_height / 2 ), 0.01, 100);
+        this.state.camera_r = new THREE.PerspectiveCamera(120, this.state.viewport_width / (this.state.viewport_height / 2), 0.01, 100);
+        this.state.camera_orth = new THREE.OrthographicCamera(-2, 2, -2, 2, 0.01, 100);
         // this.state.camera_r.position.x = 0;
         // this.state.camera_r.position.y = 0;
         // this.state.camera_r.position.z = 0;
@@ -270,7 +331,8 @@ export class Viewer extends Component {
 
         this.set_object(["Cameras", "Main Camera L"], this.state.camera_l);
         this.set_object(["Cameras", "Main Camera R"], this.state.camera_r);
-        
+        this.set_object(["Cameras", "Main Camera Orth"], this.state.camera_orth);
+
 
         // rotate the cameras to match the COLMAP format
         let rotY = new THREE.Matrix4();
@@ -279,7 +341,7 @@ export class Viewer extends Component {
         rotZ.makeRotationZ(Math.PI);
         let rot = rotY.multiply(rotZ);
         this.set_transform(["Cameras", "Main Camera R", "<object>"], rot.toArray());
-        
+
         // this.state.scene_tree.find(["Cameras", "Main Camera L"]).set_property("position", [5, -5, -5]);
         this.state.scene_tree.find(["Cameras", "Main Camera R"]).set_property("position", [-2, -2, -2]);
 
@@ -293,10 +355,15 @@ export class Viewer extends Component {
         // this.state.controls_r.autoRotate = false;
         // this.state.controls_r.update();
 
+        this.set_transform(["Cameras", "Main Camera Orth", "<object>"], rot.toArray());
+        this.state.scene_tree.find(["Cameras", "Main Camera Orth"]).set_property("position", [-1, -1, -1]);
+
         let camera_axes_l = new THREE.AxesHelper(1);
         let camera_axes_r = new THREE.AxesHelper(1);
+        let camera_axes_orth = new THREE.AxesHelper(1);
         this.set_object(["Cameras", "Main Camera L", "Axes"], camera_axes_l);
         this.set_object(["Cameras", "Main Camera R", "Axes"], camera_axes_r);
+        this.set_object(["Cameras", "Main Camera Orth", "Axes"], camera_axes_orth);
 
         // Axes display
         let axes = new THREE.AxesHelper(5);
@@ -348,8 +415,9 @@ export class Viewer extends Component {
     }
 
     render() {
-        return (
-            <div ref={ref => (this.mount = ref)} />
+        return ( <
+            div ref = { ref => (this.mount = ref) }
+            />
         )
     }
 }

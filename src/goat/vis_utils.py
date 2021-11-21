@@ -219,48 +219,59 @@ def draw_camera_frustum(vis,
                         pose=tf.translation_matrix([0, 0, 0]),
                         K=None,
                         name="0000000",
-                        displayed_focal_length=0.5,
-                        # height=1.0
+                        displayed_focal_length=None,
+                        shift_forward=None,
+                        height=None,
+                        realistic=True
                         ):
     """Draw the camera in the scene.
     """
-    full_name_str = "/Images/{}".format(name)
 
     assert K[0, 0] == K[1, 1]
     focal_length = K[0, 0]
     pp_w = K[0, 2]
     pp_h = K[1, 2]
 
-    # width = (pp_w / pp_h) * height
-    # print(width)
-    width = 2.0 * (pp_w / focal_length) * displayed_focal_length
-    height = 2.0 * (pp_h / focal_length) * displayed_focal_length
+    if displayed_focal_length:
+        assert height is None or not realistic
+    if height:
+        assert displayed_focal_length is None or not realistic
+
+    if height:
+        dfl = height / (2.0 * (pp_h / focal_length))
+        width = 2.0 * (pp_w / focal_length) * dfl
+        if displayed_focal_length is None:
+            displayed_focal_length = dfl
+    elif displayed_focal_length:
+        width = 2.0 * (pp_w / focal_length) * displayed_focal_length
+        height = 2.0 * (pp_h / focal_length) * displayed_focal_length
+    else:
+        assert not realistic
 
     if pose.shape == (3, 4):
         pose = np.concatenate([pose, np.zeros_like(pose[:1])], axis=0)
         pose[3, 3] = 1.0
 
-    # # draw the frustum
-    # g_frustum = c.frustum(scale=1.0, focal_length=displayed_focal_length, width=width, height=height)
-    # print(g_frustum)
-    # vis[full_name_str + "/frustum"].set_object(g_frustum)
+    # draw the frustum
+    g_frustum = c.frustum(scale=1.0, focal_length=displayed_focal_length, width=width, height=height)
+    vis[name + "/frustum"].set_object(g_frustum)
+    if not realistic:
+        vis[name + "/frustum"].set_transform(tf.translation_matrix([0, 0, displayed_focal_length]))
 
     # draw the image plane
     g_image_plane = c.ImagePlane(image, width=width, height=height)
-    vis[full_name_str + "/image_plane"].set_object(g_image_plane)
-    vis[full_name_str + "/image_plane"].set_transform(tf.translation_matrix([0, 0, -displayed_focal_length]))
+    vis[name + "/image_plane"].set_object(g_image_plane)
+    if realistic:
+        vis[name + "/image_plane"].set_transform(tf.translation_matrix([0, 0, -displayed_focal_length]))
 
-    # if colmap_format:
-    #     # rotate if using the colmap camera format
-    #     yrot = R.from_euler('y', 180, degrees=True).as_matrix()
-    #     zrot = R.from_euler('z', 180, degrees=True).as_matrix()
-    #     rotation = yrot @ zrot
-    #     transform = np.eye(4)
-    #     transform[:3, :3] = rotation
-    #     vis[full_name_str].set_transform(transform)
+    if shift_forward:
+        matrix = tf.translation_matrix([0, 0, displayed_focal_length])
+        matrix2 = tf.translation_matrix([0, 0, -shift_forward])
+        vis[name + "/frustum"].set_transform(matrix2 @ matrix)
+        vis[name + "/image_plane"].set_transform(matrix2)
 
     # set the transform of the camera
-    vis["/Images/{}".format(name)].set_transform(pose)
+    vis[name].set_transform(pose)
 
 
 def set_camera_render(vis, intrinsics=None, pose=None, name="renderer"):
@@ -281,7 +292,6 @@ def set_persp_camera(vis, pose, K, colmap=True):
     pose_processed = copy.deepcopy(pose)
     if colmap:
         pose_processed[:, 1:3] *= -1
-    vis["/Cameras/Main Camera R"].set_transform(pose_processed)
     pp_w = K[0,2]
     pp_h = K[1,2]
     assert K[0,0] == K[1,1]
@@ -290,6 +300,7 @@ def set_persp_camera(vis, pose, K, colmap=True):
     fov = 2.0 * np.arctan(x) * (180.0 / np.pi)
     vis["/Cameras/Main Camera R/<object>"].set_property("fov", fov)
     vis["/Cameras/Main Camera R/<object>"].set_property("aspect", float(pp_w / pp_h)) # three.js expects width/height
+    vis["/Cameras/Main Camera R"].set_transform(pose_processed)
 
 def set_orth_camera(vis, pose, width, height, colmap=True):
     """

@@ -54,6 +54,8 @@ def get_absolute_path(path, proj_root_func=get_git_root):
     Returns the full, absolute path.
     Relative paths are assumed to start at the repo directory.
     """
+    if path == "":
+        return ""
     absolute_path = path
     if absolute_path[0] != "/":
         absolute_path = os.path.join(

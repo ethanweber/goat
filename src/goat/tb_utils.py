@@ -5,11 +5,11 @@ import os
 import glob
 from collections import defaultdict
 import scipy.misc
-try:
-    import tensorflow.compat.v1 as tf
-    tf.disable_v2_behavior()
-except:
-    pass
+# try:
+#     import tensorflow.compat.v1 as tf
+#     tf.disable_v2_behavior()
+# except:
+#     pass
 from tqdm import tqdm
 
 

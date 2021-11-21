@@ -113,15 +113,12 @@ def get_camera_wireframe(scale: float = 0.3, f=4, w=1.5, h=2):
     Args:
         f (focal length): this is the focal length
     """
-    a = np.array([-w, -h, -f])
-    up1 = np.array([0, -h, -f])
-    up2 = np.array([0, 1.5*-h, -f])
-    b = np.array([w, -h, -f])
-    c = np.array([w, h, -f])
-    d = np.array([-w, h, -f])
+    ul = np.array([-w, h, -f])
+    ur = np.array([w, h, -f])
+    ll = np.array([-w, -h, -f])
+    lr = np.array([w, -h, -f])
     C = np.zeros(3)
-    F = np.array([0, 0, -f * 0.5])
-    camera_points = [a, up1, up2, up1, b, d, c, a, C, b, d, C, c, C, F]
+    camera_points = [C, ul, C, ur, C, ll, C, lr, C]
     lines = np.stack([x for x in camera_points]) * scale
     return lines
 
@@ -160,12 +157,13 @@ def frustum(scale=1.0, color=[0, 0, 0], focal_length=4, width=1.5, height=2):
     """TODO(ethan): make the scale adjustable depending on the camera size
     color - color of lines using R, G, B. default is black
     """
+    # print("linewidth")
     camera_wireframe_lines = get_camera_wireframe(scale=scale, f=focal_length, w=width / 2.0, h=height / 2.0)
     N = len(camera_wireframe_lines)
     colors = np.array([color for _ in range(N)])
     line_segments = LineSegments(
         PointsGeometry(position=camera_wireframe_lines.astype(np.float32).T,
                        color=colors.astype(np.float32).T),
-        LineBasicMaterial(vertexColors=True)
+        LineBasicMaterial(vertexColors=True, linewidth=10.0)
     )
     return line_segments
