@@ -1,2 +1,25 @@
 GPUtil
 pycocotools
+opencv-python
+torch
+torchgeometry
+pytorch-lightning
+einops
+test-tube
+kornia
+matplotlib
+jupyter
+imageio
+imageio-ffmpeg
+pandas
+plotly
+pillow
+fastcluster
+flask
+flask-cors
+# for threejs:
+u-msgpack-python>=2.4.1
+tornado>=4.0.0
+pyzmq>=17.0.0
+pyngrok>=4.1.6
+socketio
