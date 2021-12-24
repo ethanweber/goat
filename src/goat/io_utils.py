@@ -33,10 +33,6 @@ def write_to_txt(filename: str, content):
         f.write(content)
 
 
-# def get_project_root() -> Path:
-#     return Path(__file__).parent.parent.absolute()
-
-
 def get_git_root(path, dirs=(".git",), default=None):
     """https://stackoverflow.com/questions/22081209/find-the-root-of-the-git-repository-where-the-file-lives
     """

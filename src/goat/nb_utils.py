@@ -12,16 +12,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from collections import defaultdict
 import glob
-from os.path import join as pjoin
+import pickle
 
+# image stuff
+import imageio
+import mediapy as media
+import cv2
 
-from .io_utils import *
-from . import debug_utils
-from . import view_utils
-from .coco_dataset import COCODataset
-
+# ipython stuff
 from IPython import get_ipython
-
 def setup_ipynb():
     """
     https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
@@ -36,3 +35,5 @@ def setup_ipynb():
         return True
     except:
         return False
+
+setup_ipynb()

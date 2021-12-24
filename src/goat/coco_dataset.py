@@ -349,6 +349,8 @@ class COCODataset:
         image_id,
         show_colors=False,
         show_class_name=True,
+        show_conf_score=True,
+        mask_alpha=0.75,
         thresh=None
     ):
 
@@ -365,7 +367,7 @@ class COCODataset:
             used_box_strs.add(bbox_str)
 
             mask = pycocomask.decode(annotation["segmentation"])
-            color = tuple(list((255.0 * np.random.rand(3)).astype("int")) + [int(200)])  # RGB, alpha
+            color = tuple(list((255.0 * np.random.rand(3)).astype("int")) + [int(mask_alpha * 255)])  # RGB, alpha
             polygons = get_polygons_from_mask(mask)
             im_pil = Image.fromarray(image)
             for polygon_temp in polygons:
@@ -404,10 +406,19 @@ class COCODataset:
             #         print(accept_label)
 
             # image = np.asarray(im_pil)
-            if show_class_name:
+            if show_class_name or show_conf_score:
                 try:
                     point = tuple(polygons[0][0])
+
                     class_name = self.class_id_to_class_name[annotation["category_id"]]
+                    conf_score = str(round(annotation["score"], 3))
+
+                    string = ""
+                    if show_class_name:
+                        string += class_name
+                    if show_conf_score:
+                        string += " " + conf_score
+
                     # font = ImageFont.load("arial.pil")
                     # font = ImageFont.truetype(r'C:\Users\System-Pc\Desktop\arial.ttf', 20)
                     # im_dra.text(point, class_name, size=24)
@@ -415,7 +426,7 @@ class COCODataset:
                     color = (255, 255, 255)
                     font = cv2.FONT_HERSHEY_SIMPLEX
                     thickness = 2
-                    image = cv2.putText(image, class_name, point, font, fontScale, color, thickness, cv2.LINE_AA)
+                    image = cv2.putText(image, string, point, font, fontScale, color, thickness, cv2.LINE_AA)
                 except:
                     pass
 
