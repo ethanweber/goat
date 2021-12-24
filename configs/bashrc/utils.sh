@@ -11,3 +11,8 @@ cudavis() {
     echo "echo \$CUDA_VISIBLE_DEVICES"
     echo "$CUDA_VISIBLE_DEVICES"
 }
+
+clearnb() {
+    # clears the notebook cells via the terminal
+    jupyter nbconvert --clear-output --inplace $1
+}
