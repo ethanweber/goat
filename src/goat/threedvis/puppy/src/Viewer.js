@@ -222,7 +222,7 @@ export class Viewer extends Component {
             this.state.renderer_save.render(this.state.scene, camera_r);
             let imgData = this.state.renderer_save.domElement.toDataURL();
             this.state.images.push(imgData.toString());
-            this.save_image(imgData);
+            // this.save_image(imgData);
         }
     }
 
