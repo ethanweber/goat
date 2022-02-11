@@ -13,6 +13,7 @@ python run_start_server.py
 # start the React JS, client-side visualizer
 cd puppy
 npm install
+export NODE_OPTIONS=--openssl-legacy-provider # https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported
 npm start
 
 # navigate to the visualizer
