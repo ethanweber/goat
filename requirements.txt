@@ -3,19 +3,19 @@ pycocotools
 opencv-python
 torch
 torchgeometry
-pytorch-lightning
+# pytorch-lightning
 einops
 test-tube
 kornia
 matplotlib
 jupyter
-imageio
-imageio-ffmpeg
+# imageio
+# imageio-ffmpeg
 pandas
 plotly
 pillow
 fastcluster
-flask
+# flask
 flask-cors==3.0.10
 # for threejs:
 u-msgpack-python>=2.4.1

@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import GPUtil
+import time
 
 
 def get_gpus(maxLoad=0.5, maxMemory=0.5):
@@ -26,9 +27,14 @@ def get_gpus(maxLoad=0.5, maxMemory=0.5):
     return deviceIDs
 
 
-def get_chunks(lst, n):
+def get_chunks(lst, num_chunks=None, size_of_chunk=None):
     """Returns list of n elements, constaining a sublist."""
-    size = len(lst) // n
+    if num_chunks:
+        assert not size_of_chunk
+        size = len(lst) // num_chunks
+    if size_of_chunk:
+        assert not num_chunks
+        size = size_of_chunk
     chunks = []
     for i in range(0, len(lst), size):
         chunks.append(lst[i:i + size])
@@ -54,6 +60,18 @@ def dict_to_torch_device(stuff, torch_device):
             stuff[k] = dict_to_torch_device(v, torch_device)
     if type(stuff) is torch.Tensor:
         return stuff.to(torch_device)
+    else:
+        return stuff
+
+
+def dict_to_torch_type(stuff, torch_type):
+    """
+    """
+    if type(stuff) is dict:
+        for k, v in stuff.items():
+            stuff[k] = dict_to_torch_type(v, torch_type)
+    if type(stuff) is torch.Tensor:
+        return stuff.type(torch_type)
     else:
         return stuff
 
@@ -141,10 +159,11 @@ def get_hostname():
     return socket.gethostname()
 
 
-def stop():
+def exit():
     import sys
     print("called goat.stop()")
     sys.exit()
+
 
 def pose_to_homo(pose):
     """TODO(ethan): write this for torch too
@@ -152,5 +171,20 @@ def pose_to_homo(pose):
     if pose.shape == (3, 4):
         pose = np.concatenate([pose, np.zeros_like(pose[:1])], -2)
         pose[3, 3] = 1
-    assert pose.shape == (4,4)
+    assert pose.shape == (4, 4)
     return pose
+
+
+def timeit(method):
+    # https://medium.com/pythonhive/python-decorator-to-measure-the-execution-time-of-methods-fa04cb6bb36d.
+    def timed(*args, **kw):
+        ts = time.time()
+        result = method(*args, **kw)
+        te = time.time()
+        if 'log_time' in kw:
+            name = kw.get('log_name', method.__name__.upper())
+            kw['log_time'][name] = (te - ts)
+        else:
+            print("%s %2.6f sec" % (method.__name__, te - ts))
+        return result
+    return timed

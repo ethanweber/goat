@@ -36,5 +36,6 @@ from goat.nb_utils import (
 
 from goat.utils import (
     gettimedatestring,
-    stop
+    exit,
+    timeit
 )

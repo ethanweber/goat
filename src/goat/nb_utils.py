@@ -19,6 +19,14 @@ import imageio
 import mediapy as media
 import cv2
 
+# plotly stuff
+import plotly.graph_objects as go
+
+# pyrender stuff
+# os.environ['PYOPENGL_PLATFORM'] = 'egl'
+# import pyrender
+# import trimesh
+
 # ipython stuff
 from IPython import get_ipython
 def setup_ipynb():

@@ -9,9 +9,17 @@ from . import edit_utils
 import goat.threedvis.meshcat.geometry as g
 import goat.threedvis.meshcat.cameras as c
 import goat.threedvis.meshcat.transformations as tf
+from goat.threedvis.meshcat import ViewerWindow, Visualizer
 from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
 import torch
+
+def get_vis():
+    """Returns the vis object.
+    """
+    window = ViewerWindow(zmq_url="tcp://0.0.0.0:6000")
+    vis = Visualizer(window=window)
+    return vis
 
 
 def show_box_test(vis):
@@ -23,9 +31,6 @@ def show_box_test(vis):
             color=0xff0000
         )
     )
-
-
-""
 
 
 def get_random_color():

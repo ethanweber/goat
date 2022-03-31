@@ -5,6 +5,7 @@ from os.path import join as pjoin
 import pickle
 import yaml
 
+
 def load_from_json(filename: str):
     assert filename.endswith(".json")
     with open(filename, "r") as f:
@@ -28,7 +29,16 @@ def write_to_pkl(filename: str, content):
     with open(filename, "wb") as f:
         pickle.dump(content, f)
 
+
+def load_from_txt(filename: str):
+    assert filename.endswith(".txt")
+    with open(filename) as f:
+        lines = f.readlines()
+        return lines
+
+
 def write_to_txt(filename: str, content):
+    assert filename.endswith(".txt")
     with open(filename, "w") as f:
         f.write(content)
 
