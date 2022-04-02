@@ -1,26 +1,25 @@
 GPUtil
-pycocotools
-opencv-python
-torch
-torchgeometry
-# pytorch-lightning
 einops
-test-tube
+fastcluster
+flask-cors==3.0.10
+jupyter
 kornia
 matplotlib
-jupyter
-# imageio
-# imageio-ffmpeg
+mediapy
+opencv-python
 pandas
-plotly
 pillow
-fastcluster
-# flask
-flask-cors==3.0.10
-# for threejs:
-u-msgpack-python>=2.4.1
-tornado>=4.0.0
-pyzmq>=17.0.0
+plotly
+pycocotools
+python-socketio
 pyngrok>=4.1.6
-setuptools>=41.0.0
+pyzmq>=17.0.0
+scipy
+setuptools>=60
 tensorboard>=2.2.0
+test-tube
+torch
+torchgeometry
+tornado>=4.0.0
+tqdm
+u-msgpack-python>=2.4.1

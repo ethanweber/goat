@@ -3,7 +3,7 @@ import os
 
 # gather dependencies from requirements.txt
 lib_folder = os.path.dirname(os.path.realpath(__file__))
-reqquirements_filename = lib_folder + '/requirements.txt'
+reqquirements_filename = lib_folder + "/requirements.txt"
 install_requires = []
 if os.path.isfile(reqquirements_filename):
     with open(reqquirements_filename) as f:
@@ -24,9 +24,8 @@ setuptools.setup(
     long_description="A long description.",
     long_description_content_type="text/markdown",
     url="https://github.com/ethanweber/goat",
-    packages=setuptools.find_packages("src"),
-    package_dir={"": "src"},
+    packages=setuptools.find_packages(),
     test_suite="goat",
-    python_requires='>=3.6',
-    install_requires=install_requires
+    python_requires=">=3.6",
+    install_requires=install_requires,
 )
