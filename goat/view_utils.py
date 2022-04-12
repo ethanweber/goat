@@ -4,8 +4,7 @@ Examples:
     https://gist.github.com/ethanweber/79dd0a0a1341c243e26bae3772cd4505
 """
 
-from IPython.display import IFrame
-from IPython.core.display import display, HTML
+from IPython.display import IFrame, display, HTML
 import cv2
 import base64
 import matplotlib.pyplot as plt
