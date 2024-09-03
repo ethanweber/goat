@@ -1,7 +1,7 @@
 GPUtil
 einops
 fastcluster
-flask-cors==3.0.10
+flask-cors==5.0.0
 jupyter
 kornia
 matplotlib
